@@ -50,7 +50,11 @@ func runConvert(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to close file %s: %v\n", inputFile, closeErr)
+		}
+	}()
 
 	u, err := parser.Parse(f)
 	if err != nil {
@@ -142,7 +146,7 @@ func findContainersForPod(dir string, podFilename string) ([]*quadlet.ContainerU
 
 		// Parse
 		u, err := parser.Parse(f)
-		f.Close()
+		_ = f.Close()
 		if err != nil {
 			continue
 		}
