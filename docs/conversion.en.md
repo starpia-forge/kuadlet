@@ -1,6 +1,6 @@
 # Quadlet to Kubernetes Conversion Rules
 
-This document describes the currently implemented conversion rules for `kube-quadlet`. The tool statically analyzes Quadlet files (`.container`, `.pod`, `.volume`) and generates Kubernetes manifests.
+This document describes the currently implemented conversion rules for `kuadlet`. The tool statically analyzes Quadlet files (`.container`, `.pod`, `.volume`) and generates Kubernetes manifests.
 
 ## General Rules
 
@@ -78,7 +78,7 @@ Fields map to `spec.template.spec.containers[0].securityContext`.
 ### Pod Association (`Pod`)
 
 *   If a `.container` file contains a `Pod` key referencing a `.pod` file in the same directory, it is intended to be aggregated into that Pod.
-*   **Warning:** If you convert such a `.container` file directly (e.g., `kube-quadlet convert myapp.container`), it will be converted as a **standalone Deployment**, and the `Pod` field will be ignored with a warning.
+*   **Warning:** If you convert such a `.container` file directly (e.g., `kuadlet convert myapp.container`), it will be converted as a **standalone Deployment**, and the `Pod` field will be ignored with a warning.
 
 ## Pod Unit (`.pod`)
 

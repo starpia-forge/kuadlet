@@ -1,8 +1,8 @@
-# kube-quadlet
+# kuadlet
 
-`kube-quadlet` is a lightweight CLI tool designed to bridge the gap between Podman's systemd integration and Kubernetes. It statically parses Podman Quadlet configuration files (such as `.container`, `.pod`, and `.volume`) and automatically generates equivalent Kubernetes YAML manifests.
+`kuadlet` is a lightweight CLI tool designed to bridge the gap between Podman's systemd integration and Kubernetes. It statically parses Podman Quadlet configuration files (such as `.container`, `.pod`, and `.volume`) and automatically generates equivalent Kubernetes YAML manifests.
 
-Unlike the native `podman kube generate` command, which requires the containers to be actively running or created in the local Podman database, `kube-quadlet` performs a **pure static translation**. You only need the text files to generate your Kubernetes Deployments, Services, and PersistentVolumeClaims.
+Unlike the native `podman kube generate` command, which requires the containers to be actively running or created in the local Podman database, `kuadlet` performs a **pure static translation**. You only need the text files to generate your Kubernetes Deployments, Services, and PersistentVolumeClaims.
 
 ## 🎯 Project Goals
 
@@ -21,10 +21,10 @@ Unlike the native `podman kube generate` command, which requires the containers 
 
 ```bash
 # Convert a single Quadlet container file to a Kubernetes manifest
-kube-quadlet convert ./my-app.container > deployment.yaml
+kuadlet convert ./my-app.container > deployment.yaml
 
 # Convert a Quadlet pod file
-kube-quadlet convert ./my-stack.pod > my-stack.yaml
+kuadlet convert ./my-stack.pod > my-stack.yaml
 ```
 
 ## 📚 Documentation

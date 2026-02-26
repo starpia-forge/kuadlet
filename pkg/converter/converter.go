@@ -2,7 +2,7 @@ package converter
 
 import (
 	"fmt"
-	"kube-quadlet/pkg/quadlet"
+	"kuadlet/pkg/quadlet"
 	"strconv"
 	"strings"
 	"time"

@@ -61,7 +61,7 @@ jobs:
 
       - name: Build Binary
         run: |
-          go build -o kube-quadlet ./cmd/kube-quadlet
+          go build -o kuadlet ./cmd/kuadlet
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4

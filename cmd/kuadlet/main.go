@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"kube-quadlet/pkg/converter"
-	"kube-quadlet/pkg/parser"
-	"kube-quadlet/pkg/quadlet"
+	"kuadlet/pkg/converter"
+	"kuadlet/pkg/parser"
+	"kuadlet/pkg/quadlet"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +16,7 @@ import (
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "kube-quadlet",
+		Use:   "kuadlet",
 		Short: "Convert Podman Quadlet files to Kubernetes manifests",
 	}
 
