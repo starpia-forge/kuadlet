@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"kube-quadlet/pkg/parser"
-	"kube-quadlet/pkg/quadlet"
+	"kuadlet/pkg/parser"
+	"kuadlet/pkg/quadlet"
 	"reflect"
 	"sort"
 	"strings"

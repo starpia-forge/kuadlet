@@ -2,7 +2,7 @@ package quadlet
 
 import (
 	"fmt"
-	"kube-quadlet/pkg/parser"
+	"kuadlet/pkg/parser"
 	"os"
 	"strconv"
 	"strings"

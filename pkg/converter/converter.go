@@ -2,7 +2,8 @@ package converter
 
 import (
 	"fmt"
-	"kube-quadlet/pkg/quadlet"
+	"math"
+	"kuadlet/pkg/quadlet"
 	"strconv"
 	"strings"
 	"time"
@@ -272,21 +273,37 @@ func createContainerSpec(c *quadlet.ContainerUnit, name string) (*corev1.Contain
 
                 if c.Container.HealthInterval != "" {
                     if d, err := time.ParseDuration(c.Container.HealthInterval); err == nil {
-                        livenessProbe.PeriodSeconds = int32(d.Seconds())
+                        if d.Seconds() > math.MaxInt32 {
+                            livenessProbe.PeriodSeconds = math.MaxInt32
+                        } else {
+                            livenessProbe.PeriodSeconds = int32(d.Seconds())
+                        }
                     }
                 }
                 if c.Container.HealthTimeout != "" {
                     if d, err := time.ParseDuration(c.Container.HealthTimeout); err == nil {
-                        livenessProbe.TimeoutSeconds = int32(d.Seconds())
+                        if d.Seconds() > math.MaxInt32 {
+                            livenessProbe.TimeoutSeconds = math.MaxInt32
+                        } else {
+                            livenessProbe.TimeoutSeconds = int32(d.Seconds())
+                        }
                     }
                 }
                 if c.Container.HealthStartPeriod != "" {
                     if d, err := time.ParseDuration(c.Container.HealthStartPeriod); err == nil {
-                        livenessProbe.InitialDelaySeconds = int32(d.Seconds())
+                        if d.Seconds() > math.MaxInt32 {
+                            livenessProbe.InitialDelaySeconds = math.MaxInt32
+                        } else {
+                            livenessProbe.InitialDelaySeconds = int32(d.Seconds())
+                        }
                     }
                 }
                 if c.Container.HealthRetries > 0 {
-                    livenessProbe.FailureThreshold = int32(c.Container.HealthRetries)
+                    if c.Container.HealthRetries > math.MaxInt32 {
+                         livenessProbe.FailureThreshold = math.MaxInt32
+                    } else {
+                         livenessProbe.FailureThreshold = int32(c.Container.HealthRetries)
+                    }
                 }
             }
         }
@@ -393,15 +410,22 @@ func parsePortSpec(spec string, name string) (*corev1.ContainerPort, int, *corev
 		hPort = cPort
 	}
 
+	if cPort > 65535 || cPort < 0 {
+		return nil, 0, nil, fmt.Errorf("container port %d out of valid range (0-65535)", cPort)
+	}
+	if hPort > 65535 || hPort < 0 {
+		return nil, 0, nil, fmt.Errorf("host port %d out of valid range (0-65535)", hPort)
+	}
+
 	cp := &corev1.ContainerPort{
 		Name:          name,
-		ContainerPort: int32(cPort),
+		ContainerPort: int32(cPort), // nosec G109 - validated above (0-65535)
 		Protocol:      corev1.ProtocolTCP,
 	}
 
 	sp := &corev1.ServicePort{
 		Name:       name,
-		Port:       int32(hPort),
+		Port:       int32(hPort), // nosec G109 - validated above (0-65535)
 		TargetPort: intstr.FromInt(cPort),
 		Protocol:   corev1.ProtocolTCP,
 	}

@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"kube-quadlet/pkg/parser"
-	"kube-quadlet/pkg/quadlet"
+	"kuadlet/pkg/parser"
+	"kuadlet/pkg/quadlet"
 	"strings"
 	"testing"
 
@@ -84,9 +84,11 @@ Pod=my-pod.pod
 	// Check Volumes (from Pod)
 	if len(deployment.Spec.Template.Spec.Volumes) != 1 {
 		t.Errorf("Expected 1 volume from Pod, got %d", len(deployment.Spec.Template.Spec.Volumes))
-	}
-	if deployment.Spec.Template.Spec.Volumes[0].Name != "vol-0" { // Generated name
-		// Check source
+	} else {
+		// Only check name if volume exists
+		if deployment.Spec.Template.Spec.Volumes[0].Name != "pod-vol-0" {
+			t.Errorf("Expected volume name 'pod-vol-0', got %s", deployment.Spec.Template.Spec.Volumes[0].Name)
+		}
 	}
 
 	// Check Service (from Pod)

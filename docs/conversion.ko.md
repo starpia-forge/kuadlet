@@ -1,6 +1,6 @@
 # Quadlet to Kubernetes 변환 규칙
 
-이 문서는 `kube-quadlet`의 현재 구현된 변환 규칙을 설명합니다. 이 도구는 Quadlet 파일(`.container`, `.pod`, `.volume`)을 정적으로 분석하여 Kubernetes 매니페스트를 생성합니다.
+이 문서는 `kuadlet`의 현재 구현된 변환 규칙을 설명합니다. 이 도구는 Quadlet 파일(`.container`, `.pod`, `.volume`)을 정적으로 분석하여 Kubernetes 매니페스트를 생성합니다.
 
 ## 일반 규칙
 
@@ -78,7 +78,7 @@
 ### Pod 연결 (`Pod`)
 
 *   `.container` 파일에 같은 디렉토리의 `.pod` 파일을 참조하는 `Pod` 키가 포함된 경우, 해당 Pod로 집계되도록 의도된 것입니다.
-*   **경고:** 이러한 `.container` 파일을 직접 변환(예: `kube-quadlet convert myapp.container`)하면 **독립적인 Deployment**로 변환되며, `Pod` 필드는 경고와 함께 무시됩니다.
+*   **경고:** 이러한 `.container` 파일을 직접 변환(예: `kuadlet convert myapp.container`)하면 **독립적인 Deployment**로 변환되며, `Pod` 필드는 경고와 함께 무시됩니다.
 
 ## Pod 유닛 (`.pod`)
 

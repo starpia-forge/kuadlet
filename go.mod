@@ -1,4 +1,4 @@
-module kube-quadlet
+module kuadlet
 
 go 1.25.7
 

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"kube-quadlet/pkg/converter"
-	"kube-quadlet/pkg/parser"
-	"kube-quadlet/pkg/quadlet"
+	"kuadlet/pkg/converter"
+	"kuadlet/pkg/parser"
+	"kuadlet/pkg/quadlet"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +16,7 @@ import (
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "kube-quadlet",
+		Use:   "kuadlet",
 		Short: "Convert Podman Quadlet files to Kubernetes manifests",
 	}
 
@@ -36,7 +36,7 @@ func main() {
 }
 
 func runConvert(cmd *cobra.Command, args []string) error {
-	inputFile := args[0]
+	inputFile := filepath.Clean(args[0])
 	absPath, err := filepath.Abs(inputFile)
 	if err != nil {
 		return err
@@ -50,7 +50,13 @@ func runConvert(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil {
+			safeInput := sanitize(inputFile)
+			safeErr := sanitize(closeErr.Error())
+			fmt.Fprintf(os.Stderr, "Warning: failed to close file %s: %s\n", safeInput, safeErr)
+		}
+	}()
 
 	u, err := parser.Parse(f)
 	if err != nil {
@@ -64,7 +70,10 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		c := quadlet.LoadContainer(u)
 		// Check if it belongs to a pod
 		if c.Container.Pod != "" {
-			fmt.Fprintf(os.Stderr, "Warning: Container %s belongs to pod %s. Converting as standalone Deployment (pod wrapper logic not applied).\n", filename, c.Container.Pod)
+			// Sanitize output for XSS/log injection prevention (G705)
+			safeFilename := sanitize(filename)
+			safePod := sanitize(c.Container.Pod)
+			fmt.Fprintf(os.Stderr, "Warning: Container %s belongs to pod %s. Converting as standalone Deployment (pod wrapper logic not applied).\n", safeFilename, safePod)
 		}
 		objs, err := converter.ConvertContainer(c, name)
 		if err != nil {
@@ -132,17 +141,19 @@ func findContainersForPod(dir string, podFilename string) ([]*quadlet.ContainerU
 			continue
 		}
 
-		path := filepath.Join(dir, file.Name())
+		path := filepath.Clean(filepath.Join(dir, file.Name()))
 		f, err := os.Open(path)
 		if err != nil {
 			// Warn and skip?
-			fmt.Fprintf(os.Stderr, "Warning: failed to read %s: %v\n", path, err)
+			safePath := sanitize(path)
+			safeErr := sanitize(err.Error())
+			fmt.Fprintf(os.Stderr, "Warning: failed to read %s: %s\n", safePath, safeErr)
 			continue
 		}
 
 		// Parse
 		u, err := parser.Parse(f)
-		f.Close()
+		_ = f.Close()
 		if err != nil {
 			continue
 		}
@@ -157,4 +168,8 @@ func findContainersForPod(dir string, podFilename string) ([]*quadlet.ContainerU
 		}
 	}
 	return containers, names, nil
+}
+
+func sanitize(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, "\n", ""), "\r", "")
 }
