@@ -52,7 +52,9 @@ func runConvert(cmd *cobra.Command, args []string) error {
 	}
 	defer func() {
 		if closeErr := f.Close(); closeErr != nil {
-			fmt.Fprintf(os.Stderr, "Warning: failed to close file %s: %v\n", inputFile, closeErr)
+			safeInput := sanitize(inputFile)
+			safeErr := sanitize(closeErr.Error())
+			fmt.Fprintf(os.Stderr, "Warning: failed to close file %s: %s\n", safeInput, safeErr)
 		}
 	}()
 
@@ -69,8 +71,8 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		// Check if it belongs to a pod
 		if c.Container.Pod != "" {
 			// Sanitize output for XSS/log injection prevention (G705)
-			safeFilename := strings.ReplaceAll(strings.ReplaceAll(filename, "\n", ""), "\r", "")
-			safePod := strings.ReplaceAll(strings.ReplaceAll(c.Container.Pod, "\n", ""), "\r", "")
+			safeFilename := sanitize(filename)
+			safePod := sanitize(c.Container.Pod)
 			fmt.Fprintf(os.Stderr, "Warning: Container %s belongs to pod %s. Converting as standalone Deployment (pod wrapper logic not applied).\n", safeFilename, safePod)
 		}
 		objs, err := converter.ConvertContainer(c, name)
@@ -143,8 +145,9 @@ func findContainersForPod(dir string, podFilename string) ([]*quadlet.ContainerU
 		f, err := os.Open(path)
 		if err != nil {
 			// Warn and skip?
-			safePath := strings.ReplaceAll(strings.ReplaceAll(path, "\n", ""), "\r", "")
-			fmt.Fprintf(os.Stderr, "Warning: failed to read %s: %v\n", safePath, err)
+			safePath := sanitize(path)
+			safeErr := sanitize(err.Error())
+			fmt.Fprintf(os.Stderr, "Warning: failed to read %s: %s\n", safePath, safeErr)
 			continue
 		}
 
@@ -165,4 +168,8 @@ func findContainersForPod(dir string, podFilename string) ([]*quadlet.ContainerU
 		}
 	}
 	return containers, names, nil
+}
+
+func sanitize(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, "\n", ""), "\r", "")
 }

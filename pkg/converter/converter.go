@@ -273,17 +273,29 @@ func createContainerSpec(c *quadlet.ContainerUnit, name string) (*corev1.Contain
 
                 if c.Container.HealthInterval != "" {
                     if d, err := time.ParseDuration(c.Container.HealthInterval); err == nil {
-                        livenessProbe.PeriodSeconds = int32(d.Seconds())
+                        if d.Seconds() > math.MaxInt32 {
+                            livenessProbe.PeriodSeconds = math.MaxInt32
+                        } else {
+                            livenessProbe.PeriodSeconds = int32(d.Seconds())
+                        }
                     }
                 }
                 if c.Container.HealthTimeout != "" {
                     if d, err := time.ParseDuration(c.Container.HealthTimeout); err == nil {
-                        livenessProbe.TimeoutSeconds = int32(d.Seconds())
+                        if d.Seconds() > math.MaxInt32 {
+                            livenessProbe.TimeoutSeconds = math.MaxInt32
+                        } else {
+                            livenessProbe.TimeoutSeconds = int32(d.Seconds())
+                        }
                     }
                 }
                 if c.Container.HealthStartPeriod != "" {
                     if d, err := time.ParseDuration(c.Container.HealthStartPeriod); err == nil {
-                        livenessProbe.InitialDelaySeconds = int32(d.Seconds())
+                        if d.Seconds() > math.MaxInt32 {
+                            livenessProbe.InitialDelaySeconds = math.MaxInt32
+                        } else {
+                            livenessProbe.InitialDelaySeconds = int32(d.Seconds())
+                        }
                     }
                 }
                 if c.Container.HealthRetries > 0 {
