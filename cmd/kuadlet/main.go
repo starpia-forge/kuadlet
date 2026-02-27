@@ -111,6 +111,7 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		}
 		processedNames[name] = absPath
 
+		// #nosec G304 -- inputFile is user-specified, intended behavior for CLI
 		f, err := os.Open(inputFile)
 		if err != nil {
 			safePath := sanitize(inputFile)
@@ -225,6 +226,7 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		if splitOutput {
 			// Write to file
 			outFilename := fmt.Sprintf("%s.yaml", res.Name)
+			// #nosec G304 -- outFilename is derived from user input filename, sanitized via filepath.Base
 			f, err := os.Create(outFilename)
 			if err != nil {
 				return fmt.Errorf("failed to create output file %s: %w", outFilename, err)

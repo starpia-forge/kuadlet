@@ -212,7 +212,7 @@ type BuildSection struct {
 	Pull                 string
 	Retry                int
 	RetryDelay           string
-	Secret               []string
+	Secret               []string // #nosec G117 -- Refers to secret configuration name, not actual secret data
 	SetWorkingDirectory  string
 	Target               string
 	TLSVerify            bool
